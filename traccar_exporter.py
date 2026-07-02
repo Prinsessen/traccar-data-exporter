@@ -35,6 +35,15 @@ class TraccarExporter:
         self.email = email
         self.password = password
         self.session = requests.Session()
+        # Self-signed / private CA Traccar servers: skip TLS verification for all
+        # requests (login, devices, positions). Suppress the noisy warning.
+        self.session.verify = False
+        try:
+            requests.packages.urllib3.disable_warnings(
+                requests.packages.urllib3.exceptions.InsecureRequestWarning
+            )
+        except Exception:
+            pass
         self.devices = []
         self.authenticated = False
     def test_connection(self) -> bool:
